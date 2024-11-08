@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Book:
     def __init__(self, id, title, author, availability = True):
         self.id = id
@@ -25,6 +27,7 @@ class Library:
                     book.availability = False
                     print(f"{book.title} by {book.author} has been checked out!")
                     self.saveToFile()
+                    self.log(currentUser, id, "borrowed")
                     return
                 else:
                     print(f"{book.title} by {book.author} is not available!")
@@ -38,6 +41,7 @@ class Library:
                     book.availability = True
                     print(f"{book.title} by {book.author} has been returned!")
                     self.saveToFile()
+                    self.log(currentUser, id, "returned")
                     return
                 else:
                     print(f"{book.title} by {book.author} has already been returned!")
@@ -62,6 +66,10 @@ class Library:
                     self.list.append(Book(int(id), title, author, availability == "True"))
         except:
             print("File not found!")
+
+    def log(self, user, id, action):
+        with open("PY/LibraryOOP/log.txt", "a") as log:
+            log.write(f"{datetime.now()}, ID: {id}, {action} by {user}\n")
 
     def deleteBook(self):
         req = int(input("Enter book ID to delete: "))
@@ -98,18 +106,27 @@ def auth():
     for i in range(len(userList)):
         if userInput == userList[i] and codeInput == codeList[i]:
             print("Logged in!")
+            global currentUser
+            currentUser = userInput
             return True
     print("Invalid username or password.")
     return False
+
+def determineAdmin(user):
+    with open("PY/LibraryOOP/adminlist.txt", "r") as admins:
+        for admin in admins:
+            if user == admin:
+                return True
 
 def createAccount():
     print("Creating a new account...")
     userNew, codeNew = input("Enter username: "), input("Enter password: ")
     with open("PY/LibraryOOP/credentials.txt", "a") as users:
-        # Fix .write()
         users.writelines(userNew + "\n" + codeNew + "\n")
     match input("Account created! Would you like to login (Y/N)"):
         case "Y" | "y":
+            global currentUser
+            currentUser = userNew
             return True
         case "N" | "n":
             return False
