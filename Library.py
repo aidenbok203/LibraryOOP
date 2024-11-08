@@ -28,6 +28,7 @@ class Library:
                     print(f"{book.title} by {book.author} has been checked out!")
                     self.saveToFile()
                     self.log(currentUser, id, "borrowed")
+                    self.writeOwnership(id, currentUser)
                     return
                 else:
                     print(f"{book.title} by {book.author} is not available!")
@@ -42,11 +43,40 @@ class Library:
                     print(f"{book.title} by {book.author} has been returned!")
                     self.saveToFile()
                     self.log(currentUser, id, "returned")
+                    self.removeOwnership(id, currentUser)
                     return
                 else:
                     print(f"{book.title} by {book.author} has already been returned!")
                     return
         print(f"Book ID {id} does not exist!")
+
+    def checkOwnership(self, id, user):
+        with open("PY/LibraryOOP/ownership.txt", "r") as owners:
+            for owner in owners:
+                owner_user, owner_id = owner.strip().split()
+                if owner_user == user and owner_id == str(id):
+                    return True
+        return False
+
+    def writeOwnership(self, id, user):
+        with open("PY/LibraryOOP/ownership.txt", "a") as owners:
+            owners.write(f"{user} {id}\n")
+
+    def removeOwnership(self, id, user):
+        found = False
+        if self.checkOwnership(id, user):
+            with open("PY/LibraryOOP/ownership.txt", "r") as owners:
+                lines = owners.readlines()
+            
+            with open("PY/LibraryOOP/ownership.txt", "w") as owners:
+                for line in lines:
+                    owner_user, owner_id = line.strip().split()
+                    if not (owner_user == user and owner_id == str(id)):
+                        owners.write(line)
+                    else:
+                        found = True
+        
+        return found
 
     def showBooks(self):
         for book in self.list:
@@ -111,12 +141,6 @@ def auth():
             return True
     print("Invalid username or password.")
     return False
-
-def determineAdmin(user):
-    with open("PY/LibraryOOP/adminlist.txt", "r") as admins:
-        for admin in admins:
-            if user == admin:
-                return True
 
 def createAccount():
     print("Creating a new account...")
