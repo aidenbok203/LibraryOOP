@@ -6,7 +6,7 @@ class Book:
         self.availability = availability
 
     def __str__(self):
-        return f"ID: {self.id}, Title: '{self.title}', Author: {self.author}, Available: {self.availability}"
+        return f"ID: {self.id}, Title: {self.title}, Author: {self.author}, Available: {self.availability}"
 
 class Library:
     def __init__(self):
