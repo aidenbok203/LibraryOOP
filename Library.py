@@ -126,31 +126,29 @@ def logon():
             print("Invalid input!")
 
 def menu(library):
-    if logon() == True:
-        userIn = int(input("1. Add new book \n2. Display all books \n3. Checkout a book \n4. Return a book \n5. Delete a book \n6. Exit system \n"))
-        match userIn:
-            case 1:
-                library.addBook(int(input("Enter book ID: ")), str(input("Enter title: ")), str(input("Enter author: ")))
-                print("Book added to library!")
-                menu(library)
-            case 2:
-                library.showBooks()
-                menu(library)
-            case 3:
-                library.checkout(int(input("Enter book ID: ")))
-                menu(library)
-            case 4:
-                library.returnBook(int(input("Enter book ID: ")))
-                menu(library)
-            case 5:
-                library.deleteBook()
-                menu(library)
-            case 6:
-                print("Closing library.")
-                exit()
-            case _:
-                print("Invalid selection!")
-                menu(library)
+    if logon():
+        while True:
+            try:
+                userIn = int(input("1. Add new book \n2. Display all books \n3. Checkout a book \n4. Return a book \n5. Delete a book \n6. Exit system \n"))
+                match userIn:
+                    case 1:
+                        library.addBook(int(input("Enter book ID: ")), str(input("Enter title: ")), str(input("Enter author: ")))
+                        print("Book added to library!")
+                    case 2:
+                        library.showBooks()
+                    case 3:
+                        library.checkout(int(input("Enter book ID: ")))
+                    case 4:
+                        library.returnBook(int(input("Enter book ID: ")))
+                    case 5:
+                        library.deleteBook()
+                    case 6:
+                        print("Closing library.")
+                        break
+                    case _:
+                        print("Invalid selection!")
+            except ValueError:
+                print("Invalid input!")
 
 def main():
     library = Library()
