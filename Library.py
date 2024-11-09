@@ -39,12 +39,15 @@ class Library:
         for book in self.list:
             if book.id == id:
                 if not book.availability:
-                    book.availability = True
-                    print(f"{book.title} by {book.author} has been returned!")
-                    self.saveToFile()
-                    self.log(currentUser, id, "returned")
-                    self.removeOwnership(id, currentUser)
-                    return
+                    if self.removeOwnership(id, currentUser):
+                        book.availability = True
+                        print(f"{book.title} by {book.author} has been returned!")
+                        self.saveToFile()
+                        self.log(currentUser, id, "returned")
+                        return
+                    else:
+                        print(f"You do not own book ID {id}!")
+                        return
                 else:
                     print(f"{book.title} by {book.author} has already been returned!")
                     return
@@ -67,7 +70,6 @@ class Library:
         if self.checkOwnership(id, user):
             with open("PY/LibraryOOP/ownership.txt", "r") as owners:
                 lines = owners.readlines()
-            
             with open("PY/LibraryOOP/ownership.txt", "w") as owners:
                 for line in lines:
                     owner_user, owner_id = line.strip().split()
@@ -75,7 +77,6 @@ class Library:
                         owners.write(line)
                     else:
                         found = True
-        
         return found
 
     def showBooks(self):
