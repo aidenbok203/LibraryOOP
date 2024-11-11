@@ -120,6 +120,32 @@ class Library:
         else:
             self.loadFromFile()
 
+    def modifyBook(self, reqId, field: int, changeTo):
+        found = False
+        with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
+            lines = f.readlines()
+        with open("PY/LibraryOOP/Bookshelf.txt", "w") as f:
+            for line in lines:
+                id, title, author, availability = line.strip().split(",", 3)
+                if int(id) == reqId:
+                    found = True
+                    # 1 = Title
+                    # 2 = Author
+                    match field:
+                        case 1:
+                            title = changeTo
+                        case 2:
+                            author = changeTo
+                        case _:
+                            print("Invalid input!")
+                    f.write(f"{id},{title},{author},{availability}")
+                else:
+                    f.write(line)
+        if found:
+            print(f"Book ID {reqId} has been modified!")
+        else:
+            print(f"Book ID {reqId} does not exist!")
+
 def auth():
     userList = []
     codeList = []
@@ -175,7 +201,7 @@ def menu(library):
     if logon():
         while True:
             try:
-                userIn = int(input("1. Add new book \n2. Display all books \n3. Checkout a book \n4. Return a book \n5. Delete a book \n6. Exit system \n"))
+                userIn = int(input("1. Add new book \n2. Display all books \n3. Checkout a book \n4. Return a book \n5. Modify a book \n6. Delete a book \n7. Exit system \n"))
                 match userIn:
                     case 1:
                         library.addBook(int(input("Enter book ID: ")), str(input("Enter title: ")), str(input("Enter author: ")))
@@ -187,9 +213,23 @@ def menu(library):
                     case 4:
                         library.returnBook(int(input("Enter book ID: ")))
                     case 5:
-                        library.deleteBook()
+                        library.modifyBook(int(input("Book ID to change: ")), int(input("1. Title, 2. Author: ")), input("What would you like to change it to? "))
                     case 6:
+                        library.deleteBook()
+                    case 7:
                         print("Closing library.")
+                        break
+                    case _:
+                        print("Invalid selection!")
+            except ValueError:
+                print("Invalid input!")
+
+def main():
+    library = Library()
+    menu(library)
+
+if __name__ == "__main__":
+    main()
                         break
                     case _:
                         print("Invalid selection!")
