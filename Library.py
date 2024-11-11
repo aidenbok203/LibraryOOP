@@ -127,7 +127,7 @@ def auth():
     userInput, codeInput = input("Enter username: "), input("Enter password: ")
     with open("PY/LibraryOOP/credentials.txt", "r") as users:
         tempList = users.readlines()
-    for i in range(int(len(tempList) / 2)):
+    for i in range(int(len(tempList) / 2)) :
         userList.append(tempList[x])
         x += 1
         codeList.append(tempList[x])
@@ -159,13 +159,17 @@ def createAccount():
             print("Invalid input!")
 
 def logon():
-    match int(input("1. Sign in, 2. Sign up\n")):
-        case 1:
-            return auth()
-        case 2:
-            return createAccount()
-        case _:
-            print("Invalid input!")
+    try:
+        match int(input("1. Sign in, 2. Sign up\n")):
+            case 1:
+                return auth()
+            case 2:
+                return createAccount()
+            case _:
+                print("Invalid input!")
+    except ValueError:
+        print("Invalid input!")
+        logon()
 
 def menu(library):
     if logon():
