@@ -230,15 +230,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-                        break
-                    case _:
-                        print("Invalid selection!")
-            except ValueError:
-                print("Invalid input!")
-
-def main():
-    library = Library()
-    menu(library)
-
-if __name__ == "__main__":
-    main()
