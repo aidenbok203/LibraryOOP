@@ -1,5 +1,6 @@
 from datetime import datetime
 from dataclasses import dataclass
+import sqlite3
 
 @dataclass
 class Book:
@@ -14,7 +15,20 @@ class Book:
 class Library:
     def __init__(self):
         self.list = []
+        self.createDB()
         self.loadFromFile()
+
+    def createDB(self):
+        conn = sqlite3.connect("PY/LibraryOOP/library.db")
+        cursor = conn.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS books (
+                        id INTEGER PRIMARY KEY,
+                        title TEXT NOT NULL,
+                        author TEXT NOT NULL,
+                        availability BOOLEAN NOT NULL )
+                        """)
+        conn.commit()
+        conn.close()
 
     def verifyExistence(self, id) -> bool:
         for book in self.list:
@@ -94,19 +108,24 @@ class Library:
             print(book)
 
     def saveToFile(self) -> None:
-        with open("PY/LibraryOOP/Bookshelf.txt", "w") as f:
-            for book in self.list:
-                f.write(f"{book.id},{book.title},{book.author},{book.availability}\n")
+        conn = sqlite3.connect("PY/LibraryOOP/library.db")
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM books")
+        for book in self.list:
+            cursor.execute("INSERT INTO books (id, title, author, availability) VALUES (?, ?, ?, ?)",
+                            (book.id, book.title, book.author, book.availability)
+            )
+        conn.commit()
+        conn.close()
 
-    def loadFromFile(self) -> None:
-        self.list = []
-        try:
-            with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
-                for line in f:
-                    id, title, author, availability = line.strip().split(",")
-                    self.list.append(Book(int(id), title, author, availability == "True"))
-        except:
-            print("File not found!")
+    def loadFromFile(self):
+        conn = sqlite3.connect("PY/LibraryOOP/library.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, title, author, availability FROM books")
+        rows = cursor.fetchall()
+        for row in rows:
+            self.list.append(Book(id=row[0], title=row[1], author=row[2], availability=row[3]))
+        conn.close()
 
     def log(self, user, id, action) -> None:
         with open("PY/LibraryOOP/log.txt", "a") as log:
@@ -115,40 +134,31 @@ class Library:
     def deleteBook(self) -> None:
         req = int(input("Enter book ID to delete: "))
         found = False
-        with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
-            lines = f.readlines()
-        with open("PY/LibraryOOP/Bookshelf.txt", "w") as f:
-            for line in lines:
-                id, title, author, availability = line.strip().split(",", 3)
-                if int(id) == req:
-                    found = True
-                    print(f"Book ID {req} deleted!")
-                    continue
-                f.write(line)
+        for book in self.list:
+            if book.id == req:
+                found = True
+                self.list.remove(book)
+                print(f"Book ID {req} deleted!")
+                continue
         if not found:
             print(f"Book ID {req} not found!")
         else:
-            self.loadFromFile()
+            self.saveToFile()
 
     def modifyBook(self, reqId, field: int, changeTo) -> None:
         found = False
-        with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
-            lines = f.readlines()
-        with open("PY/LibraryOOP/Bookshelf.txt", "w") as f:
-            for line in lines:
-                id, title, author, availability = line.strip().split(",", 3)
-                if int(id) == reqId:
-                    found = True
-                    match field:
-                        case 1:
-                            title = changeTo
-                        case 2:
-                            author = changeTo
-                        case _:
-                            print("Invalid input!")
-                    f.write(f"{id},{title},{author},{availability}")
-                else:
-                    f.write(line)
+        for book in self.list:
+            if book.id == reqId:
+                found = True
+                match field:
+                    case 1:
+                        book.title = changeTo
+                        self.saveToFile()
+                    case 2:
+                        book.author = changeTo
+                        self.saveToFile
+                    case _:
+                        print("Invalid input!")
         if found:
             print(f"Book ID {reqId} has been modified!")
         else:
