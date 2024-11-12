@@ -156,7 +156,7 @@ class Library:
                         self.saveToFile()
                     case 2:
                         book.author = changeTo
-                        self.saveToFile
+                        self.saveToFile()
                     case _:
                         print("Invalid input!")
         if found:
