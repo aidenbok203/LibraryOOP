@@ -16,12 +16,21 @@ class Library:
         self.list = []
         self.loadFromFile()
 
-    def addBook(self, id, title, author):
-        new_book = Book(id, title, author)
-        self.list.append(new_book)
-        self.saveToFile()
+    def verifyExistence(self, id) -> bool:
+        for book in self.list:
+            if book.id == id:
+                return True
+        return False
 
-    def checkout(self, id):
+    def addBook(self, id, title, author) -> None:
+        if not self.verifyExistence(id):
+            new_book = Book(id, title, author)
+            self.list.append(new_book)
+            self.saveToFile()
+        else:
+            print("Book ID {id} already exists!")
+
+    def checkout(self, id) -> None:
         for book in self.list:
             if book.id == id:
                 if book.availability:
@@ -36,7 +45,7 @@ class Library:
                     return
         print(f"Book ID {id} does not exist!")
 
-    def returnBook(self, id):
+    def returnBook(self, id) -> None:
         for book in self.list:
             if book.id == id:
                 if not book.availability:
@@ -54,7 +63,7 @@ class Library:
                     return
         print(f"Book ID {id} does not exist!")
 
-    def checkOwnership(self, id, user):
+    def checkOwnership(self, id, user) -> bool:
         with open("PY/LibraryOOP/ownership.txt", "r") as owners:
             for owner in owners:
                 owner_user, owner_id = owner.strip().split()
@@ -62,11 +71,11 @@ class Library:
                     return True
         return False
 
-    def writeOwnership(self, id, user):
+    def writeOwnership(self, id, user) -> None:
         with open("PY/LibraryOOP/ownership.txt", "a") as owners:
             owners.write(f"{user} {id}\n")
 
-    def removeOwnership(self, id, user):
+    def removeOwnership(self, id, user) -> bool:
         found = False
         if self.checkOwnership(id, user):
             with open("PY/LibraryOOP/ownership.txt", "r") as owners:
@@ -80,16 +89,16 @@ class Library:
                         found = True
         return found
 
-    def showBooks(self):
+    def showBooks(self) -> None:
         for book in self.list:
             print(book)
 
-    def saveToFile(self):
+    def saveToFile(self) -> None:
         with open("PY/LibraryOOP/Bookshelf.txt", "w") as f:
             for book in self.list:
                 f.write(f"{book.id},{book.title},{book.author},{book.availability}\n")
 
-    def loadFromFile(self):
+    def loadFromFile(self) -> None:
         self.list = []
         try:
             with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
@@ -99,11 +108,11 @@ class Library:
         except:
             print("File not found!")
 
-    def log(self, user, id, action):
+    def log(self, user, id, action) -> None:
         with open("PY/LibraryOOP/log.txt", "a") as log:
             log.write(f"{datetime.now()}, ID: {id}, {action} by {user}\n")
 
-    def deleteBook(self):
+    def deleteBook(self) -> None:
         req = int(input("Enter book ID to delete: "))
         found = False
         with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
@@ -121,7 +130,7 @@ class Library:
         else:
             self.loadFromFile()
 
-    def modifyBook(self, reqId, field: int, changeTo):
+    def modifyBook(self, reqId, field: int, changeTo) -> None:
         found = False
         with open("PY/LibraryOOP/Bookshelf.txt", "r") as f:
             lines = f.readlines()
@@ -130,8 +139,6 @@ class Library:
                 id, title, author, availability = line.strip().split(",", 3)
                 if int(id) == reqId:
                     found = True
-                    # 1 = Title
-                    # 2 = Author
                     match field:
                         case 1:
                             title = changeTo
@@ -147,7 +154,7 @@ class Library:
         else:
             print(f"Book ID {reqId} does not exist!")
 
-def auth():
+def auth() -> bool:
     userList = []
     codeList = []
     x = 0
@@ -170,7 +177,7 @@ def auth():
     print("Invalid username or password.")
     return False
 
-def createAccount():
+def createAccount() -> bool:
     print("Creating a new account...")
     userNew, codeNew = input("Enter username: "), input("Enter password: ")
     with open("PY/LibraryOOP/credentials.txt", "a") as users:
@@ -185,7 +192,7 @@ def createAccount():
         case _:
             print("Invalid input!")
 
-def logon():
+def logon() -> None:
     try:
         match int(input("1. Sign in, 2. Sign up\n")):
             case 1:
@@ -198,7 +205,7 @@ def logon():
         print("Invalid input!")
         logon()
 
-def menu(library):
+def menu(library) -> None:
     if logon():
         while True:
             try:
