@@ -124,7 +124,12 @@ class Library:
         cursor.execute("SELECT id, title, author, availability FROM books")
         rows = cursor.fetchall()
         for row in rows:
-            self.list.append(Book(id=row[0], title=row[1], author=row[2], availability=row[3]))
+            book = Book(id=row[0], title=row[1], author=row[2], availability=row[3])
+            if book.availability == 1:
+                book.availability = True
+            else:
+                book.availability = False
+            self.list.append(book)
         conn.close()
 
     def log(self, user, id, action) -> None:
